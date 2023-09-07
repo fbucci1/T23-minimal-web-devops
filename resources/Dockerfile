@@ -1,0 +1,55 @@
+FROM node:18-alpine
+
+ARG T23_SM_PROVIDER
+ARG T23_SM_KEY
+ARG T23_SM_VAULT_ADDR
+ARG T23_SM_VAULT_USER
+ARG T23_SM_VAULT_PASS
+ARG T23_SM_AWS_REGION
+ARG T23_SM_AWS_ACCESS_KEY_ID
+ARG T23_SM_AWS_SECRET_ACCESS_KEY
+ARG T23_LA_OUT_FILE
+ARG T23_LA_OUT_FILE_FORMAT
+ARG T23_LA_ENV_READ_AND_SET_1
+ARG T23_LA_ENV_READ_AND_SET_2
+ARG T23_LA_CMD_APP
+
+ENV T23_SM_PROVIDER=$T23_SM_PROVIDER
+ENV T23_SM_KEY=$T23_SM_KEY
+ENV T23_SM_VAULT_ADDR=$T23_SM_VAULT_ADDR
+ENV T23_SM_VAULT_USER=$T23_SM_VAULT_USER
+ENV T23_SM_VAULT_PASS=$T23_SM_VAULT_PASS
+ENV T23_SM_AWS_REGION=$T23_SM_AWS_REGION
+ENV T23_SM_AWS_ACCESS_KEY_ID=$T23_SM_AWS_ACCESS_KEY_ID
+ENV T23_SM_AWS_SECRET_ACCESS_KEY=$T23_SM_AWS_SECRET_ACCESS_KEY
+ENV T23_LA_OUT_FILE=$T23_LA_OUT_FILE
+ENV T23_LA_OUT_FILE_FORMAT=$T23_LA_OUT_FILE_FORMAT
+ENV T23_LA_ENV_READ_AND_SET_1=$T23_LA_ENV_READ_AND_SET_1
+ENV T23_LA_ENV_READ_AND_SET_2=$T23_LA_ENV_READ_AND_SET_2
+ENV T23_LA_CMD_APP=$T23_LA_CMD_APP
+
+RUN mkdir -p /usr/src/T23-shared-utils
+COPY T23-shared-utils /usr/src/T23-shared-utils
+WORKDIR /usr/src/T23-shared-utils/src
+RUN npm install
+
+RUN mkdir -p /usr/src/T23-cliente-gestor-secretos
+COPY T23-cliente-gestor-secretos /usr/src/T23-cliente-gestor-secretos
+WORKDIR /usr/src/T23-cliente-gestor-secretos/src
+RUN npm install
+
+RUN mkdir -p /usr/src/T23-lanzador
+COPY T23-lanzador /usr/src/T23-lanzador
+WORKDIR /usr/src/T23-lanzador/src
+RUN npm install
+
+RUN mkdir -p /usr/src/T23-minimal-web
+COPY T23-minimal-web /usr/src/T23-minimal-web
+WORKDIR /usr/src/T23-minimal-web/src
+RUN npm install
+
+WORKDIR /usr/src/T23-lanzador/src
+
+EXPOSE 3000
+
+CMD [ "node", "lanzador.js" ]

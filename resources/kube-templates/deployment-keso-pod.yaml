@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: depl-keso
+  labels:
+    app: pod-keso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-keso
+  template:
+    metadata:
+      labels:
+        app: pod-keso
+    spec:
+      containers:
+        - name: cont-keso
+          image: t23-minimal-web-w-lanzador
+          imagePullPolicy: Never
+          env:
+          - name: T23_SECRET_1
+            valueFrom:
+              secretKeyRef:
+                name: sec-replicated-app1
+                key: replicated-first-secret
+          - name: T23_SECRET_2
+            valueFrom:
+              secretKeyRef:
+                name: sec-replicated-app1
+                key: replicated-second-secret
+          - name: T23_SECRET_3
+            valueFrom:
+              secretKeyRef:
+                name: sec-replicated-app1
+                key: replicated-app1-secrets
+          - name: T23_LA_CMD_APP
+            value: "node ../../T23-minimal-web/src/server.js > /tmp/server.js.log 2>&1"
+          ports:
+          - containerPort: 3000

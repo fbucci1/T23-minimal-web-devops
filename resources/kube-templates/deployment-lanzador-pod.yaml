@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: depl-lanzador
+ labels:
+  app: pod-lanzador
+spec:
+ replicas: 1
+ selector:
+  matchLabels:
+   app: pod-lanzador
+ template:
+  metadata:
+   labels:
+    app: pod-lanzador
+  spec:
+   containers:
+   - name: cont-lanzador
+     image: t23-minimal-web-w-lanzador
+     imagePullPolicy: Never
+     env:
+     - name: T23_SM_PROVIDER
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_PROVIDER
+     - name: T23_SM_KEY
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_KEY
+     - name: T23_SM_VAULT_ADDR
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_VAULT_ADDR
+     - name: T23_SM_VAULT_USER
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_VAULT_USER
+     - name: T23_SM_VAULT_PASS
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_VAULT_PASS
+     - name: T23_SM_AWS_REGION
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_AWS_REGION
+     - name: T23_SM_AWS_ACCESS_KEY_ID
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_AWS_ACCESS_KEY_ID
+     - name: T23_SM_AWS_SECRET_ACCESS_KEY
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_SM_AWS_SECRET_ACCESS_KEY
+     - name: T23_LA_OUT_FILE
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_LA_OUT_FILE
+     - name: T23_LA_OUT_FILE_FORMAT
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_LA_OUT_FILE_FORMAT
+     - name: T23_LA_ENV_READ_AND_SET_1
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_LA_ENV_READ_AND_SET_1
+     - name: T23_LA_ENV_READ_AND_SET_2
+       valueFrom:
+         secretKeyRef:
+           name: sec-app1-lanzador
+           key: T23_LA_ENV_READ_AND_SET_2
+     - name: T23_LA_CMD_APP
+       value: "node ../../T23-minimal-web/src/server.js > /tmp/server.js.log 2>&1"
+     ports:
+     - containerPort: 3000

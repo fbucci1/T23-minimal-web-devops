@@ -1,0 +1,38 @@
+#Script para instalar Vault en EC2
+
+export T23_SM_KEY="app1"
+export VAULT_ADDR=http://localhost:80
+export VAULT_TOKEN=xxxxx
+export T23_SM_VAULT_USER=xxx
+export T23_SM_VAULT_PASS=xxx
+
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install -y vault
+vault --version
+
+sudo apt-install -y jq
+
+sudo pkill vault 
+
+sudo vault server -dev -dev-listen-address "0.0.0.0:80" -dev-root-token-id "$VAULT_TOKEN" & 
+
+while ! curl --silent --output /dev/null ${VAULT_ADDR}
+do printf 'will retry in 2 seconds\n'; sleep 2; done
+curl --output - ${VAULT_ADDR}
+
+vault kv put -mount=secret ${T23_SM_KEY} first-secret=W1-A-secret-in-HashicorpVault second-secret=W2-A-secret-in-HashicorpVault
+
+VAULT_JWTOKEN=$(vault token create --format=json | jq -r ".auth.client_token")
+curl -s --header "X-Vault-Token: $VAULT_JWTOKEN" --request GET ${VAULT_ADDR}/v1/secret/data/${T23_SM_KEY} | jq -c ".data.data"
+
+vault policy write policy${T23_SM_KEY} - <<EOF
+path "secret/data/${T23_SM_KEY}" {
+  capabilities = ["read"]
+}
+EOF
+
+vault auth enable userpass
+vault write auth/userpass/users/${T23_SM_VAULT_USER} password=${T23_SM_VAULT_PASS} policies=Policy${T23_SM_KEY}
+
+#Obtener la IP publica de la máquina y comprobar el acceso externo a http://ip:80

@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xxxINTERNAL_VAULT_NAMExxx
+  namespace: default
+spec:
+  ports:
+  - protocol: TCP
+    port: 8200
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: xxxINTERNAL_VAULT_NAMExxx
+subsets:
+  - addresses:
+      - ip: xxxEXTERNAL_VAULT_IPxxx
+    ports:
+      - port: 8200
